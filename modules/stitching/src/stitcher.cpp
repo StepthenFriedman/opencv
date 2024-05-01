@@ -42,7 +42,8 @@
 
 #include "precomp.hpp"
 
-namespace cv {
+namespace rm {
+    using namespace cv;
 
 #if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900/*MSVS 2015*/)
 // Stitcher::ORIG_RESOL is initialized in stitching.hpp.
@@ -59,7 +60,7 @@ Ptr<Stitcher> Stitcher::create(Mode mode)
     stitcher->setCompositingResol(ORIG_RESOL);
     stitcher->setPanoConfidenceThresh(1);
     stitcher->setSeamFinder(makePtr<detail::GraphCutSeamFinder>(detail::GraphCutSeamFinderBase::COST_COLOR));
-    stitcher->setBlender(makePtr<detail::MultiBandBlender>(false));
+    stitcher->setBlender(makePtr<detail::MultiBandBlender>(true));
     stitcher->setFeaturesFinder(ORB::create());
     stitcher->setInterpolationFlags(INTER_LINEAR);
 
@@ -75,7 +76,7 @@ Ptr<Stitcher> Stitcher::create(Mode mode)
         stitcher->setEstimator(makePtr<detail::HomographyBasedEstimator>());
         stitcher->setWaveCorrection(true);
         stitcher->setWaveCorrectKind(detail::WAVE_CORRECT_HORIZ);
-        stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestMatcher>(false));
+        stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestMatcher>(true));
         stitcher->setBundleAdjuster(makePtr<detail::BundleAdjusterRay>());
         stitcher->setWarper(makePtr<SphericalWarper>());
         stitcher->setExposureCompensator(makePtr<detail::BlocksGainCompensator>());
@@ -84,7 +85,7 @@ Ptr<Stitcher> Stitcher::create(Mode mode)
     case SCANS:
         stitcher->setEstimator(makePtr<detail::AffineBasedEstimator>());
         stitcher->setWaveCorrection(false);
-        stitcher->setFeaturesMatcher(makePtr<detail::AffineBestOf2NearestMatcher>(false, false));
+        stitcher->setFeaturesMatcher(makePtr<detail::AffineBestOf2NearestMatcher>(false, true));
         stitcher->setBundleAdjuster(makePtr<detail::BundleAdjusterAffinePartial>());
         stitcher->setWarper(makePtr<AffineWarper>());
         stitcher->setExposureCompensator(makePtr<detail::NoExposureCompensator>());
@@ -156,6 +157,10 @@ Stitcher::Status Stitcher::composePanorama(InputArrayOfArrays images, OutputArra
             imgs_subset.push_back(imgs_[indices_[i]]);
             seam_est_imgs_subset.push_back(seam_est_imgs_[indices_[i]]);
         }
+Stitcher::Status Stitcher::composePanoramaAccelerate(){
+
+    return Status::OK;
+}
 
         seam_est_imgs_ = seam_est_imgs_subset;
         imgs_ = imgs_subset;

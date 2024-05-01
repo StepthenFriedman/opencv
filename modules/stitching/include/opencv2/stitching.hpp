@@ -104,7 +104,8 @@ Homography model, as they work with different transformations.
 @}
   */
 
-namespace cv {
+namespace rm {
+    using namespace cv;
 
 //! @addtogroup stitching
 //! @{
@@ -311,6 +312,8 @@ public:
     @return The mask.
      */
     UMat resultMask() const { return result_mask_; }
+
+    CV_WRAP Status composePanoramaAccelerate();
 
 private:
     Status matchImages();
